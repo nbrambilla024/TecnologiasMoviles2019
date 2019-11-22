@@ -2,8 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/AndroidLogin.iml" filepath="$PROJECT_DIR$/AndroidLogin.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/auth-android-room.iml" filepath="$PROJECT_DIR$/auth-android-room.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app/auth-android-room-app.iml" filepath="$PROJECT_DIR$/app/auth-android-room-app.iml" />
     </modules>
   </component>
 </project>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_message"
+
+            android:title="Weather City" />
+        <!--android:icon="@drawable/ic_message"-->
+        <item
+            android:id="@+id/nav_chat"
+            android:title="Weather 7 days" />
+      <!--  android:icon="@drawable/ic_chat" -->
+
+        <item
+            android:id="@+id/nav_profile"
+            android:title="Account" />
+        <!--android:icon="@drawable/ic_profile"-->
+
+    </group>
+
+    <item android:title="Communicate">
+        <menu>
+            <item
+                android:id="@+id/nav_send"
+                android:icon="@mipmap/ic_send"
+                android:title="Send Mail" />
+        </menu>
+    </item>
+</menu>

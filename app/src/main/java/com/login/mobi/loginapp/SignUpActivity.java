@@ -58,7 +58,7 @@ public class SignUpActivity extends AppCompatActivity {
         btCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(SignUpActivity.this, MainActivity.class));
+                startActivity(new Intent(SignUpActivity.this, LoginActivity.class));
                 finish();
             }
         });
@@ -77,7 +77,7 @@ public class SignUpActivity extends AppCompatActivity {
                                     edtEmail.getText().toString(), edtPassword.getText().toString());
                             userDao.insert(user);
                             progressDialog.dismiss();
-                            startActivity(new Intent(SignUpActivity.this, MainActivity.class));
+                            startActivity(new Intent(SignUpActivity.this, LoginActivity.class));
                         }
                     }, 1000);
 

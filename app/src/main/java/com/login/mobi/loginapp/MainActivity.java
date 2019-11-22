@@ -1,100 +1,108 @@
 package com.login.mobi.loginapp;
-
-import android.app.ProgressDialog;
-import android.arch.persistence.room.Room;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.Bundle;
-import android.os.Handler;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.net.Uri;
+import android.support.annotation.NonNull;
+import android.support.design.widget.NavigationView;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.text.TextUtils;
-import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
+import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import com.login.mobi.loginapp.Database.UserDao;
-import com.login.mobi.loginapp.Database.UserDatabase;
 import com.login.mobi.loginapp.Models.User;
 
-public class MainActivity extends AppCompatActivity {
-
-    private Button btSignIn;
-    private Button btSignUp;
-    private EditText edtEmail;
-    private EditText edtPassword;
-    private UserDatabase database;
-
-    private UserDao userDao;
-    private ProgressDialog progressDialog;
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+    private DrawerLayout drawer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        progressDialog = new ProgressDialog(this);
-        progressDialog.setCancelable(false);
-        progressDialog.setMessage("Check User...");
-        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        progressDialog.setProgress(0);
-
-
-        database = Room.databaseBuilder(this, UserDatabase.class, "mi-database.db")
-                .allowMainThreadQueries()
-                .build();
-
-        userDao = database.getUserDao();
-
-
-        btSignIn = findViewById(R.id.btSignIn);
-        btSignUp = findViewById(R.id.btSignUp);
-
-        edtEmail = findViewById(R.id.emailinput);
-        edtPassword = findViewById(R.id.passwordinput);
-
-
-
-        btSignUp.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this, SignUpActivity.class));
-            }
-        });
-        btSignIn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!emptyValidation()) {
-                    progressDialog.show();
-                    new Handler().postDelayed(new Runnable() {
+        if(!isConnected()){
+            new AlertDialog.Builder(this)
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setTitle("Internet Connection Alert")
+                    .setMessage("Please check your Internet Connection")
+                    .setPositiveButton("Close", new DialogInterface.OnClickListener() {
                         @Override
-                        public void run() {
-                            User user = userDao.getUser(edtEmail.getText().toString(), edtPassword.getText().toString());
-                            if(user!=null){
-                                Intent i = new Intent(MainActivity.this, UserActivity.class);
-                                i.putExtra("User", user);
-                                startActivity(i);
-                                finish();
-                            }else{
-                                Toast.makeText(MainActivity.this, "Unregistered user, or incorrect", Toast.LENGTH_SHORT).show();
-                            }
-                            progressDialog.dismiss();
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            finish();
                         }
-                    }, 1000);
+                    })
+                    .show();
+        }
 
-                }else{
-                    Toast.makeText(MainActivity.this, "Empty Fields", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
+        drawer = findViewById(R.id.drawer_layout);
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
 
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar,
+                R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
+
+        if (savedInstanceState == null) {
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
+                    new WeatherFragment()).commit();
+            navigationView.setCheckedItem(R.id.nav_message);
+        }
     }
 
-    private boolean emptyValidation() {
-        if (TextUtils.isEmpty(edtEmail.getText().toString()) || TextUtils.isEmpty(edtPassword.getText().toString())) {
-            return true;
-        }else {
-            return false;
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.nav_message:
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
+                        new WeatherFragment()).commit();
+                break;
+            case R.id.nav_chat:
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
+                        new Weather7DaysFragment()).commit();
+                break;
+            case R.id.nav_profile:
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
+                        new ProfileFragment()).commit();
+                break;
+            case R.id.nav_send:
+                Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
+                        "mailto","nbrambilla024@alumnos.iua.edu.ar", null));
+                emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Subject");
+                emailIntent.putExtra(Intent.EXTRA_TEXT, "Probando");
+                startActivity(Intent.createChooser(emailIntent, "Send email..."));
+                break;
         }
+
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    private boolean isConnected(){
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+
+        return networkInfo != null && networkInfo.isConnected();
     }
 }
